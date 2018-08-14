@@ -5,24 +5,52 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FipIO"
         mc:Ignorable="d"
-        Title="MainWindow" FontSize="18" Height="450" Width="800">
+        Title="FipIO" FontSize="18" Height="450" Width="800">
     <Grid x:Name="GridMain" >
 
-        <Button Name="Output_All" Click="Output_all_issue" Content="Button" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75"/>
-        <TextBox Name="Issue_1" HorizontalAlignment="Left" Height="24" Margin="299,11,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-        <Button Content="Добавить" Click="Add_new_file" HorizontalAlignment="Left" Margin="137,10,0,0" VerticalAlignment="Top" Width="95"/>
-        <ScrollViewer Name="ScrollMainGrid" HorizontalAlignment="Stretch" Margin="0,43,0,0" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
-            <Grid Name="GridOfMain" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="7*" />
-                    <ColumnDefinition Width="26*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-     
-                </Grid.RowDefinitions>
-            </Grid>
+        <!--<Button Name="Output_All" Click="Output_all" Content="Вывести все" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="122"/>-->
+        <!--<TextBox Name="Issue_1" HorizontalAlignment="Left" Height="24" Margin="299,11,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <Button Content="Добавить" Click="Add_new_file" HorizontalAlignment="Left" Margin="167,10,0,0" VerticalAlignment="Top" Width="95"/>
+        <Button Content="Add lS" HorizontalAlignment="Left" Margin="468,11,0,0" VerticalAlignment="Top" Width="140" Name="Add_LSs" Click="Add_LS"/>-->
 
-        </ScrollViewer>
+        <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <TabItem Header="Task" Width="100">
+
+                <Grid Background="#FFE5E5E5">
+                    <Button x:Name="Output_All_Copy" Click="Output_all" Content="Вывести все" Margin="30,10,10,10" VerticalAlignment="Top" HorizontalAlignment="left" />
+                    <ScrollViewer Name="ScrollMainGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto" CanContentScroll="True" Margin="0,54,0,0">
+                        <Grid  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="FieldForTask">
+                            <Grid.ColumnDefinitions >
+                                <ColumnDefinition Width="auto"></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions >
+                            </Grid.RowDefinitions>
+                        </Grid>
+                    </ScrollViewer>
+                    <Button Content="Создать задачу" Click="CreateNewTask" HorizontalAlignment="Left" Margin="154,10,0,0" VerticalAlignment="Top" Width="143"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="New local server">
+                <Grid Background="#FFE5E5E5">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,25,0,0" TextWrapping="Wrap" Text="Введите название сервера" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,70,0,0" TextWrapping="Wrap" Text="Выберите файлы httpd_vhosts и vhosts-nginx" VerticalAlignment="Top" Width="282"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,133,0,0" TextWrapping="Wrap" Text="Выберите папку для копирования" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,187,0,0" TextWrapping="Wrap" Text="Выберите куда копировать папку" VerticalAlignment="Top"/>
+                    <Button Content="Файлы" Click="OpenFile" HorizontalAlignment="Left" Margin="407,78,0,0" VerticalAlignment="Top" Width="114"/>
+                    <Button Content="Выбрать" Click="SelectBeginDir" HorizontalAlignment="Left" Margin="407,136,0,0" VerticalAlignment="Top" Width="114"/>
+                    <Button Content="Выбрать" Click="SelectEndDir" HorizontalAlignment="Left" Margin="407,189,0,0" VerticalAlignment="Top" Width="114"/>
+                    <Button Content="Создать" Click="CreateCopy" HorizontalAlignment="Left" Margin="303,254,0,0" VerticalAlignment="Top" Width="114" Height="29"/>
+                    <TextBox Name="DirectoryName" HorizontalAlignment="Left" Margin="333,25,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="393"/>
+                    <TextBlock Name="FipIO_1" HorizontalAlignment="Left" Margin="557,140,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="219"/>
+                    <TextBlock Name="FipIO_2" HorizontalAlignment="Left" Margin="557,82,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="219"/>
+                    <TextBlock Name="FipIO_3" HorizontalAlignment="Left" Margin="557,193,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="219"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+
+
 
 
     </Grid>

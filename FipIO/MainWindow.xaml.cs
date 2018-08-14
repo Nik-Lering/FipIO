@@ -1,161 +1,165 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 
 namespace FipIO
 {
+    [global::System.Configuration.SettingsSerializeAs(global::System.Configuration.SettingsSerializeAs.Binary)]
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        static string PathDirectoryApp = Environment.CurrentDirectory;
+
+        string KeyForDecoda;
+
+        string[] ArrStatusTask = {"Заявка:",
+        "Папка:",
+                "Issue:",
+                "Merge:",
+                "Branch:",
+                "Описание:",
+                "Статус:"
+        };
+        static string[] FileForWriter;
+        static string[] FileOfDirectory;
+        static string FilePathFolderBegin;
+        static string FilePathFolderEnd;
         public static string FileName = "FipIO_Application_";
+        static string PathOfFile = PathDirectoryApp + "/FipIO Task/" + FileName;
 
         //Grid GridBlock = this.FindName("MainArea") as Grid;
 
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        private void Output_all_issue(object sender, EventArgs e)
-        {
-            for(int i = 0; i<10; i++)
+            
+            if(!Directory.Exists(PathDirectoryApp+"/FipIO Task"))
             {
-                TextBlock tBlock = new TextBlock
-                {
-                    Name = MainWindow.FileName + i,
-                    Text = i.ToString(),
-                    Margin = new Thickness(0, 0 + i * 20, 0, 0),
-                    //Width = 120,
-                    //Height = 10
-                };
-                Grid.SetRow(tBlock, i);
-                Grid.SetColumn(tBlock, 0);
-                GridOfMain.Children.Add(tBlock);
-                
-
+                Directory.CreateDirectory(PathDirectoryApp + "/FipIO Task");
             }
-            for (int i = 0; i < 10; i++)
-            {
-                TextBlock tBlock = new TextBlock
-                {
-                    Name = MainWindow.FileName + i,
-                    Text = i.ToString(),
-                    Margin = new Thickness(0, 0 + i * 20, 0, 0),
-                    //Width = 120,
-                    //Height = 10
-                };
-                Grid.SetRow(tBlock, i);
-                Grid.SetColumn(tBlock, 1);
-                GridOfMain.Children.Add(tBlock);
+            SavePropertis();
 
-
-            }
-            //ScrollMainGrid.Content = tBlock;
-            Issue_1.Text = "ffff";
         }
 
-        private void Add_new_file(object sender, EventArgs e)
+        private void SavePropertis()
         {
-            string FileName = FileEditOfPath.CreateFile();
-            CreateFieldForEdit(FileName);
+            FipIO_2.Text = "Last: " + System.IO.Path.GetFileNameWithoutExtension(Properties.Settings.Default.vhosts_nginx) + " / " + System.IO.Path.GetFileNameWithoutExtension(Properties.Settings.Default.httpd_vhosts);
+            FipIO_1.Text = "Last: " + System.IO.Path.GetFileNameWithoutExtension(Properties.Settings.Default.folderForCopyBegin);
+            FipIO_3.Text = "Last: " + System.IO.Path.GetFileNameWithoutExtension(Properties.Settings.Default.folderForCopyEnd);
         }
-
-        public void CreateFieldForEdit(string pathFile)
+        private void Output_all(object sender, RoutedEventArgs e)
         {
-            string[] readText = File.ReadAllLines(pathFile); // Получение того, что в файле
-            //MainWindow mainWindow = new MainWindow();
-            for (int i = 0; i < readText.Length; i++)
+
+            TextBlock tBlock;
+            System.Windows.Controls.TextBox tBox;
+            //string[] ParserText;
+            int RowCount = 0;
+            //int CountFile = 1;
+            int NumberFile = 0;
+            FileOfDirectory = Directory.GetFiles(PathDirectoryApp + "/FipIO Task");
+            for (int file = 0; file < FileOfDirectory.Length; file++)
             {
-                if (i == 1)
+                string FileNameLocal = System.IO.Path.GetFileNameWithoutExtension(FileOfDirectory[file]);
+                NumberFile = Convert.ToInt32(FileNameLocal.Replace(FileName, ""));
+
+                string[] readText = File.ReadAllLines(FileOfDirectory[file]);
+
+                for(int i = 0; i < ArrStatusTask.Length; i++)
                 {
-                    CreateFormElemTextBlock("", i);
+                    RowDefinition rDefin = new RowDefinition();
+                    rDefin.MaxHeight = 50;
+                    FieldForTask.RowDefinitions.Add(rDefin);
+                    //ParserText = ParserStringText(readText[i]);
+
+                    tBlock = CreateTextBlock(ArrStatusTask[i], RowCount, 0, NumberFile, i);
+                    FieldForTask.Children.Add(tBlock);
+                    tBox = CreateTextBox(readText[i], RowCount, 1, NumberFile, i);
+                    FieldForTask.Children.Add(tBox);
+                    RowCount++;
                 }
-                CreateFormElemTextBlock(readText[i], i);
-                CreateFormElemTextBox(readText[i], i);
+
+                tBlock = CreateTextBlock("", RowCount, 0, NumberFile, 0);
+                FieldForTask.Children.Add(tBlock);
+                tBlock = CreateTextBlock("", RowCount, 1, NumberFile, 0);
+                FieldForTask.Children.Add(tBlock);
+                RowCount++;
+                //CountFile++;
             }
         }
 
-        private void CreateFormElemTextBlock(string textForOutput, int NumberForName)
+        static TextBlock CreateTextBlock(string textFile, int Row, int Column, int CountFIle, int LineIsArr)
         {
             TextBlock tBlock = new TextBlock
             {
-                Name = MainWindow.FileName + NumberForName,
-                Text = textForOutput.ToString(),
-                Margin = new Thickness(0, 0 + NumberForName * 28, 0, 0),
-                Height = 28,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Top
+                Text = textFile,
+                Name = "Fip_IO" + CountFIle + "_" + LineIsArr
+                //Margin = new Thickness(0, 0 + Margin * 20, 0, 0),
+
             };
-            Grid.SetRow(tBlock, NumberForName);
-            Grid.SetColumn(tBlock, 0);
-            GridOfMain.Children.Add(tBlock);
+            
+            //Grid.SetRow(tBlock, i);
+            Grid.SetColumn(tBlock, Column);
+            Grid.SetRow(tBlock, Row);
+            return tBlock;
         }
 
-        private void CreateFormElemTextBox(string textForOutput, int NumberForName)
+        static System.Windows.Controls.TextBox CreateTextBox(string textFile, int Row, int Column, int CountFIle, int LineIsArr)
         {
-            TextBox tBlock = new TextBox
+            System.Windows.Controls.TextBox tBox = new System.Windows.Controls.TextBox
             {
-                Name = MainWindow.FileName + "Textbox" + NumberForName,
-                Text = textForOutput.ToString(),
-                Margin = new Thickness(0, 0 + NumberForName * 28, 0, 0),
-                Height = 28,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Top
+                Text = textFile,
+                Name = "Fip_IO" + CountFIle + "_" + LineIsArr
+                //Margin = new Thickness(0, 0 + Margin * 20, 0, 0),
+
             };
-            Grid.SetRow(tBlock, NumberForName);
-            Grid.SetColumn(tBlock, 1);
-            GridOfMain.Children.Add(tBlock);
+            tBox.TextChanged += WriterFile;
+            //Grid.SetRow(tBlock, i);
+            Grid.SetColumn(tBox, Column);
+            Grid.SetRow(tBox, Row);
+            return tBox;
         }
 
-    }
-
-    public class FileDirectoryClass
-    {
-        private static string PathToDirectrory = PathOfExeFile();
-
-        public static string PathOfExeFile()  //Получить путь папке
+        private static void WriterFile(object sender, TextChangedEventArgs e)
         {
-            return AppDomain.CurrentDomain.BaseDirectory + "\\FileForWork";
-        }
+            string TextBoxName = ((sender as System.Windows.Controls.TextBox).Name).Remove(0,6);
+            string[] FileNameAndLine = TextBoxName.Split('_');
 
-        public static string[] FilesOfDirectoryWithPath()
-        {
-            if (!Directory.Exists(PathToDirectrory))
+            string[] readText = File.ReadAllLines(PathOfFile +  FileNameAndLine[0] + ".txt");
+            readText[Convert.ToInt32(FileNameAndLine[1])] = (sender as System.Windows.Controls.TextBox).Text;
+            StreamWriter FileForWriteText = new StreamWriter(PathOfFile + FileNameAndLine[0] + ".txt", false);
+
+            for (int i = 0; i < readText.Length; i++)
             {
-                Directory.CreateDirectory(PathToDirectrory);
+                FileForWriteText.WriteLine(readText[i]);
             }
+            FileForWriteText.WriteLine();
+            FileForWriteText.Close();
 
-            return Directory.GetFiles(PathToDirectrory);
-             
+
         }
 
-        public static string [] FilesOfDirectoryWithoutPath()
+        static string[] ParserStringText(string textFile)
         {
-            string[] FileWithoutPath = FilesOfDirectoryWithPath();
-            if (FileWithoutPath.Length != 0)
-            {
-                for (int i = 0; i < FileWithoutPath.Length; i++)
-                {
-                    FileWithoutPath[i] = Path.GetFileNameWithoutExtension(FileWithoutPath[i]);
-                }
-            }
-            return FileWithoutPath;
+            //string[] ParserText;
+            string[] ParserText = textFile.Split(new char[] {'-'}, 2);
+            return ParserText;
         }
 
-    }
-
-    public class FileEditOfPath : MainWindow 
-    {
-        private static string[] FilesForWork = FileDirectoryClass.FilesOfDirectoryWithoutPath();
-
-        public static string CreateFile()
+        private void CreateNewTask(object sender, RoutedEventArgs e)
         {
-            string FilePathAndName = CreateNewFileName();
+            CreateNewFile();
+        }
 
-            using (StreamWriter FileForReader = File.CreateText(FilePathAndName))
+        private void CreateNewFile()
+        {
+            int NumberLastFile = MaxCountFile();
+
+            using (StreamWriter FileForReader = File.CreateText(PathDirectoryApp + "/FipIO Task/" + FileName + NumberLastFile + ".txt"))
             {
                 FileForReader.WriteLine("Заявка:");
                 FileForReader.WriteLine("Папка:");
@@ -165,33 +169,201 @@ namespace FipIO
                 FileForReader.WriteLine("Описание:");
                 FileForReader.WriteLine("Статус:");
             }
-
-            return FilePathAndName;
-            //EditLayoutXAMLclass EditLayout = new EditLayoutXAMLclass();
-            //EditLayout.CreateFieldForEdit(FilePathAndName);
-
         }
 
-        private static string CreateNewFileName()
+        static int MaxCountFile()
         {
-            int MaxNumberFile = MaxNumberFileOfDirectory();
-            return FileDirectoryClass.PathOfExeFile() + "\\" + MainWindow.FileName + MaxNumberFile + ".txt";
-        }
+            int max = 0;
+            int lastNumberFile;
 
-        private static int MaxNumberFileOfDirectory()
-        {
-            FilesForWork = FileDirectoryClass.FilesOfDirectoryWithoutPath();
-            int NumberLastFile = 0;
-            if (FilesForWork.Length != 0)
+            FileOfDirectory = Directory.GetFiles(PathDirectoryApp + "/FipIO Task");
+
+            for (int i = 0; i < FileOfDirectory.Length; i++)
             {
-                
-                for (int i = 0; i < FilesForWork.Length; i++)
+                string FileNameLocal = System.IO.Path.GetFileNameWithoutExtension(FileOfDirectory[i]);
+                lastNumberFile = Convert.ToInt32(FileNameLocal.Replace(FileName,""));
+                if(lastNumberFile > max)
                 {
-                    int a = int.Parse(FilesForWork[i].Replace(MainWindow.FileName, ""));
-                    if (int.Parse(FilesForWork[i].Replace(MainWindow.FileName, "")) > NumberLastFile) NumberLastFile = int.Parse(FilesForWork[i].Replace(MainWindow.FileName, ""));
+                    max = lastNumberFile;
                 }
             }
-            return NumberLastFile + 1;
+
+            return max + 1;
+        }
+
+        private void OpenFile(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog OPF = new Microsoft.Win32.OpenFileDialog();
+            OPF.Multiselect = true;
+            if (OPF.ShowDialog() == true)
+            {
+                FileForWriter = OPF.FileNames;
+            }
+        }
+
+        private void SelectBeginDir(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog OPF_folder = new FolderBrowserDialog();
+
+            if (OPF_folder.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                FilePathFolderBegin = OPF_folder.SelectedPath;
+            }
+        }
+
+        private void SelectEndDir(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog OPF_folder_end = new FolderBrowserDialog();
+
+            if (OPF_folder_end.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                FilePathFolderEnd = OPF_folder_end.SelectedPath;
+            }
+        }
+
+        private void CreateCopy(object sender, RoutedEventArgs e)
+        {
+            if (FileForWriter != null)
+            {
+                for (int i = 0; i < FileForWriter.Length; i++)
+                {
+                    string FileName = System.IO.Path.GetFileName(FileForWriter[i]);
+                    if (FileName == "httpd-vhosts.conf")
+                    {
+                        Properties.Settings.Default.httpd_vhosts = FileForWriter[i];
+                    }
+                    else if (FileName == "vhosts-nginx.conf")
+                    {
+                        Properties.Settings.Default.vhosts_nginx = FileForWriter[i];
+                    }
+                }
+            }
+
+            if (FilePathFolderBegin != null)
+            {
+                Properties.Settings.Default.folderForCopyBegin = FilePathFolderBegin;
+            }
+
+            if (FilePathFolderEnd != null)
+            {
+                Properties.Settings.Default.folderForCopyEnd = FilePathFolderEnd;
+            }
+
+            SavePropertis();
+
+            Properties.Settings.Default.Save();
+            AddTextInTextFile(Properties.Settings.Default.folderForCopyEnd, DirectoryName.Text);
+            CopyFolder();
+            ComandLine();
+        }
+
+        public void ComandLine()
+        {
+            ProcessStartInfo psi = new ProcessStartInfo();
+            psi.FileName = "cmd.exe";
+            psi.Arguments = "/k " + "cd /d " + Properties.Settings.Default.folderForCopyEnd + "/" + DirectoryName.Text + " & composer update";
+            DirectoryName.Text = psi.Arguments;
+            Process.Start(psi);
+        }
+        public void AddTextInTextFile(string PathDirectory, string NameLocalServer)
+        {
+            string[] FilesPath = {Properties.Settings.Default.vhosts_nginx,
+                Properties.Settings.Default.httpd_vhosts
+            };
+
+            if (!String.IsNullOrEmpty(FilesPath[0]) && !String.IsNullOrEmpty(FilesPath[1]))
+            {
+                string[] httpd_vhosts = {"<VirtualHost *:8000>",
+                                    "ServerName "+NameLocalServer+".loc",
+                                    "ServerAlias " + NameLocalServer + ".t199",
+                                    "DocumentRoot \"" + PathDirectory + "/" + NameLocalServer + "/www/\"",
+                                    "AddType application/x-httpd-php .php",
+                                    "Action  application/x-httpd-php /php56/php-cgi.exe",
+                                    "Alias /_syscss/ \"" + PathDirectory + "/" + NameLocalServer + "/vendor/web-autoresource/war-lib-6/src/_syscss/\"",
+                                    "Alias /_syslib/ \"" + PathDirectory + "/" + NameLocalServer + "/vendor/web-autoresource/war-lib-6/src/_syslib/\"",
+                                    "Alias /_sysimg/ \"" + PathDirectory + "/" + NameLocalServer + "/vendor/web-autoresource/war-lib-6/src/_sysimg/\"",
+                                    "Alias /_phplib/ \"" + PathDirectory + "/" + NameLocalServer + "/vendor/web-autoresource/war-lib-6/src/_UNIVERSAL/\"",
+                                    "</VirtualHost>"
+            };
+
+
+                string[] vhosts_nginx_text = {"server {",
+                                    "server_name "+ NameLocalServer+".loc " + NameLocalServer + ".t199;",
+                                    "include php_war6.conf;",
+                                    "include global.conf;",
+                                    "root " + PathDirectory + "/" + NameLocalServer+"/www;",
+                                    "set $libs " + PathDirectory + "/" + NameLocalServer +"/vendor/web-autoresource/war-lib-6/src;",
+                                    "set $sysmod " + PathDirectory + "/" + NameLocalServer + "/vendor/web-autoresource-modules;",
+                                    "}"
+            };
+
+                for (int file = 0; file < FilesPath.Length; file++)
+                {
+                    StreamWriter FileForWriteText = new StreamWriter(FilesPath[file], true);
+                    string[] textForWrite;
+                    FileForWriteText.WriteLine();
+                    if (file == 0) textForWrite = vhosts_nginx_text;
+                    else textForWrite = httpd_vhosts;
+
+                    for (int i = 0; i < textForWrite.Length; i++)
+                    {
+                        FileForWriteText.WriteLine(textForWrite[i]);
+                    }
+                    FileForWriteText.WriteLine();
+                    FileForWriteText.Close();
+                }
+
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Вы не выбрали один (или оба) из файла ('httpd - vhosts.conf' или 'vhosts - nginx.conf')");
+            }
+
+        }
+
+        private void CopyFolder()
+        {
+            if (!String.IsNullOrEmpty(Properties.Settings.Default.folderForCopyEnd) && !String.IsNullOrEmpty(Properties.Settings.Default.folderForCopyBegin))
+            {
+                DirectoryCopy(Properties.Settings.Default.folderForCopyBegin, Properties.Settings.Default.folderForCopyEnd + "/" + DirectoryName.Text, true);
+            }
+        }
+
+        private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            DirectoryInfo[] dirs = dir.GetDirectories();
+            // If the destination directory doesn't exist, create it.
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = System.IO.Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, false);
+            }
+
+            // If copying subdirectories, copy them and their contents to new location.
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = System.IO.Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                }
+            }
         }
     }
     
